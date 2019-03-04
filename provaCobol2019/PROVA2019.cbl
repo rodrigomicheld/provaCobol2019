@@ -733,12 +733,17 @@
       *----------------------------------------------------------------*
       *
            IF (WS-FS-CLIENTE           NOT EQUAL ZEROS AND '05')
-           
-               DISPLAY 'ERRO FILE STATUS: ',WS-FS-CLIENTE,' OPERACAO: ',
-               WS-OPERACAO,' ARQUIVO CLIENTE'
-                                       AT 2302
+               DISPLAY WS-LIMPAR-TELA  AT 2302
+               DISPLAY 'ERRO FILE STATUS: '
+                                       AT 2319
+               DISPLAY WS-FS-CLIENTE   AT 2320
+               DISPLAY ' OPERACAO: '   AT 2332
+               DISPLAY WS-OPERACAO     AT 2333
+               DISPLAY,' ARQUIVO CLIENTE'
+                                       AT 2335
+               
+               DISPLAY WS-LIMPAR-TELA  AT 2302
                STOP ' '
-               DISPLAY WS-LIMPAR-TELA
            END-IF
            .
       *
@@ -753,11 +758,17 @@
       *----------------------------------------------------------------*
       *
            IF (WS-FS-IMPORT            NOT EQUAL ZEROS AND '10')
-             DISPLAY 'ERRO FILE STATUS: 'WS-FS-IMPORT' OPERACAO: '
-             WS-OPERACAO' ARQUIVO CLIENTE'
-                                       AT 2302
-               STOP ' '
              DISPLAY WS-LIMPAR-TELA  AT 2302
+             DISPLAY 'ERRO FILE STATUS: '
+                                      AT 2302
+               DISPLAY WS-FS-IMPORT   AT 2323
+               DISPLAY ' OPERACAO: '   AT 2325
+               DISPLAY WS-OPERACAO     AT 2336
+               DISPLAY ' ARQUIVO IMPORT'
+                                       AT 2350
+               STOP ' '
+               DISPLAY WS-LIMPAR-TELA  AT 2302
+               
            END-IF
            
            IF (WS-FS-IMPORT            EQUAL '10')
@@ -1612,11 +1623,16 @@
       *
            IF (WS-FS-VENDEDOR          NOT EQUAL ZEROS AND '05')
            
-               DISPLAY 'ERRO FILE STATUS: ',WS-FS-VENDEDOR,' OPERACAO:' 
-      -         ',' WS-OPERACAO,' ARQUIVO VENDEDOR'
-                                       AT 2302
+               DISPLAY WS-LIMPAR-TELA  AT 2302
+             DISPLAY 'ERRO FILE STATUS: '
+                                      AT 2302
+               DISPLAY WS-FS-VENDEDOR   AT 2323
+               DISPLAY ' OPERACAO: '   AT 2325
+               DISPLAY WS-OPERACAO     AT 2336
+               DISPLAY ' ARQUIVO VENDEDOR'
+                                       AT 2350
                STOP ' '
-               DISPLAY WS-LIMPAR-TELA
+               DISPLAY WS-LIMPAR-TELA  AT 2302
            END-IF
            
            IF (WS-FS-VENDEDOR          EQUAL '10')
@@ -1697,12 +1713,15 @@
       *----------------------------------------------------------------*     
            IF WS-FS-IMPORT-VEND       NOT EQUAL ZEROS     
            
-               DISPLAY 'ERRO FILE STATUS: ',WS-FS-IMPORT-VEND,
-               ' OPERACAO: ',
-               WS-OPERACAO,' ARQUIVO IMPORTACAO VENDEDOR'
-                                       AT 2302
+               DISPLAY WS-LIMPAR-TELA  AT 2302
+             DISPLAY 'ERRO FILE STATUS: '
+                                      AT 2302
+               DISPLAY WS-FS-IMPORT-VEND   
+                                      AT 2323
+               DISPLAY ' OPERACAO: '   AT 2325
+               DISPLAY WS-OPERACAO     AT 2336
                STOP ' '
-               DISPLAY WS-LIMPAR-TELA
+               DISPLAY WS-LIMPAR-TELA  AT 2302
            END-IF
            .
            
