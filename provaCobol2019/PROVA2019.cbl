@@ -99,13 +99,15 @@
           05 WS-OPCAO                  PIC 9(001) VALUE ZEROS.
           05 WS-ARQ-CLI-ABERTO         PIC X(001) VALUE 'N'.
           05 WS-ARQ-IMPORT-ABERTO      PIC X(001) VALUE 'N'.
-          05 WS-ARQ-VEND-ABERTO        PIC X(001) VALUE 'N'.
           05 WS-ACHOU-COD              PIC X(001) VALUE 'N'.
           05 WS-MENSAGEM               PIC X(078) VALUE SPACES.
           05 WS-CRUD                   PIC X(001) VALUE SPACES.
           05 WS-RESPOSTA               PIC X(001) VALUE SPACES.
           05 WS-ARQ-IMPORT             PIC X(040) VALUE SPACES.
           05 WS-FIM-ARQ-IMPORT         PIC X(002) VALUE 'N'.
+          05 WS-FIM-ARQ-IMPORT-VEND    PIC X(002) VALUE 'N'.
+          05 WS-FIM-ARQ-CLI            PIC X(002) VALUE 'N'.
+          05 WS-ARQ-VEN-ABERTO         PIC X(001) VALUE 'N'.
        01 WS-LIMPEZA-DE-TELA.   
           05 WS-LIMPAR-TELA            PIC X(078) VALUE SPACES.
           05 WS-LIMPAR-SUB-MENU        PIC X(032) VALUE SPACES.
@@ -114,35 +116,38 @@
           05 WS-FS-CLIENTE             PIC X(002) VALUE SPACES.
           05 WS-FS-VENDEDOR            PIC X(002) VALUE SPACES.
           05 WS-FS-IMPORT              PIC X(002) VALUE SPACES.
+          05 WS-FS-IMPORT-VEND         PIC X(002) VALUE SPACES.
           05 WS-OPERACAO               PIC X(013) VALUE SPACES.
           05 WS-ABERTURA               PIC X(013) VALUE'NA ABERTURA'.
           05 WS-LEITURA                PIC X(013) VALUE'NA LEITURA'.
           05 WS-FECHAMENTO             PIC X(013) VALUE'NO FECHAMENTO'.
           05 WS-GRAVACAO               PIC X(013) VALUE'NA GRAVACAO'.
+       01 WS-TEST                      PIC X(85) VALUE SPACES.
        01 WS-AREA-ARQ-IMPORT.
           05 WS-COD-CLI                PIC 9(007) VALUE ZEROS.  
           05 WS-CNPJ                   PIC 9(014) VALUE ZEROS.
           05 WS-RZ-SOCIAL              PIC X(040) VALUE SPACES.
-          05 WS-LATITUDE-CLI           PIC S9(003)V9(008) VALUE ZEROS.
-          05 WS-LONGITUDE-CLI          PIC S9(003)V9(008) VALUE ZEROS.
+          05 WS-LATITUDE-CLI           PIC +9(003)V9(008) VALUE ZEROS.
+          05 WS-LONGITUDE-CLI          PIC +9(003)V9(008) VALUE ZEROS.
        01 WS-AREA-ARQ-IMPORT-VEN.
           05 WS-COD-VEND               PIC 9(003) VALUE ZEROS.
           05 WS-CPF                    PIC 9(011) VALUE ZEROS.
           05 WS-NOME                   PIC X(040) VALUE SPACES.
-          05 WS-LATITUDE-VEND          PIC S9(003)V9(008) VALUE ZEROS.
-          05 WS-LONGITUDE-VEND         PIC S9(003)V9(008) VALUE ZEROS.
+          05 WS-LATITUDE-VEND          PIC +9(003)V9(008) VALUE ZEROS.
+          05 WS-LONGITUDE-VEND         PIC +9(003)V9(008) VALUE ZEROS.
        01 ACU-TOTAIS.
           05 ACU-GRAVADOS              PIC 9(008) COMP-3  VALUE ZEROS.
+       01 WS-FILTROS-RELATORIO.
+          05 WS-ASC                    PIC X(001) VALUE SPACES.
+          05 WS-DESC                   PIC X(001) VALUE SPACES.
           
-         
+       01 WS-LINKAGE.
+          COPY BOOKLINK.
       *----------------------------------------------------------------*
        SCREEN                          SECTION.
       *----------------------------------------------------------------*
       * 
        01 SS-TELA-PRINCIPAL.
-      *    05 BLANK SCREEN
-      *       BACKGROUND-COLOR 0
-      *       FOREGROUND-COLOR 10.
           05 SS-TRACO                  PIC X(080) VALUE ALL '-'
                                        LINE 1 COL 1.
           05 VALUE "T E L A  P R I N C I P A L  D O  S I S T E M A"
@@ -221,9 +226,6 @@
                                        LINE 7   COL 30.
           05 VALUE "|"                 LINE 7   COL 29.
           05 VALUE "|"                 LINE 7   COL 57.
-          05 SS-TITULO                 PIC X(024) VALUE 
-             "M E N U  C A D A S T R O"
-                                       LINE 8   COL 31.
           05 VALUE "|"                 LINE 8   COL 29.
           05 VALUE "|"                 LINE 8   COL 57.
 
@@ -279,6 +281,19 @@
           05 VALUE "|"                 LINE 16  COL 57.
           05 TRACO                     PIC X(027) VALUE ALL '-'
                                        LINE 16 COL 30.                                 
+       01 SS-TELA-RELATORIO.
+          05 VALUE "01 - CODIGO CLIENTE" 
+                                       LINE 11   COL 31.
+          05 VALUE "02 - RAZAO SOCIAL" LINE 12   COL 31.
+          05 VALUE "03 - CODIGO DO VENDEDOR"       
+                                       LINE 13   COL 31.
+          05 VALUE "04 - VOLTAR"       LINE 14   COL 31.
+          05 VALUE "ENTRE COM A OPCAO: "         
+                                       LINE 23   COL 3.
+          05 SS-OPCAO                  PIC 9(01) 
+                                       LINE 23   COL 22
+                                       BLANK WHEN ZEROS
+                                       TO WS-OPCAO.
        01 SS-TELA-CADASTRO.
           05 VALUE "01 - CLIENTE"      LINE 11   COL 31.
           05 VALUE "02 - VENDEDOR"     LINE 13   COL 31.
@@ -295,30 +310,30 @@
           05 SS-TRACO                  PIC X(014) VALUE ALL '-'
                                        LINE 12   COL 61.
           05 VALUE "|"                 LINE 12   COL 60.
-          05 VALUE "|"                 LINE 12   COL 74.
+          05 VALUE "|"                 LINE 12   COL 79.
           05 SS-TITULO                 PIC X(013) VALUE "C L I E N T E"
                                        LINE 13   COL 61.
           05 VALUE "|"                 LINE 13   COL 60.
-          05 VALUE "|"                 LINE 13   COL 74.
+          05 VALUE "|"                 LINE 13   COL 79.
 
           05 SS-TRACO                  PIC X(014) VALUE ALL '-'
                                        LINE 14   COL 61.
           05 VALUE "|"                 LINE 14   COL 60.
-          05 VALUE "|"                 LINE 14   COL 74.
+          05 VALUE "|"                 LINE 14   COL 79.
           05 VALUE "|"                 LINE 15   COL 60.
-          05 VALUE "|"                 LINE 15   COL 74.
+          05 VALUE "|"                 LINE 15   COL 79.
           05 VALUE "|"                 LINE 16   COL 60.
-          05 VALUE "|"                 LINE 16   COL 74.
+          05 VALUE "|"                 LINE 16   COL 79.
           05 VALUE "|"                 LINE 17   COL 60.
-          05 VALUE "|"                 LINE 17   COL 74.
+          05 VALUE "|"                 LINE 17   COL 79.
           05 VALUE "|"                 LINE 18   COL 60.
-          05 VALUE "|"                 LINE 18   COL 74.
+          05 VALUE "|"                 LINE 18   COL 79.
           05 VALUE "|"                 LINE 19   COL 60.
-          05 VALUE "|"                 LINE 19   COL 74.
+          05 VALUE "|"                 LINE 19   COL 79.
           05 TRACO                     PIC X(014) VALUE ALL '-'
                                        LINE 20   COL 61.
           05 VALUE "|"                 LINE 20   COL 60.
-          05 VALUE "|"                 LINE 20   COL 74.
+          05 VALUE "|"                 LINE 20   COL 79.
        
        01 SS-MENU-OPCAO-VENDEDOR.
           05 SS-TRACO                  PIC X(015) VALUE ALL '-'
@@ -350,6 +365,22 @@
           05 VALUE "|"                 LINE 20   COL 60.
           05 VALUE "|"                 LINE 20   COL 76.
 
+       01 SS-TELA-FILTRO.
+          05 VALUE "ASCENDENTE"        LINE 15   COL 62.
+          05 SS-ASC                    PIC X(001)        
+                                       LINE 15   COL 77
+                                       TO WS-ASC.
+          05 VALUE "DECRESCENTE"       LINE 16   COL 62.
+          05 VALUE "ENTRE COM A OPCAO: "
+                                       LINE 23   COL 3.
+          05 SS-OPCAO                  PIC 9(01) 
+                                       LINE 23   COL 22
+                                       BLANK WHEN ZEROS
+                                       TO WS-OPCAO.
+          05 SS-CODIGO-RELAT           PIC 9(07) 
+                                       LINE 23   COL 59
+                                       BLANK WHEN ZEROS
+                                       TO BOOKCLI-COD-CLI.
        01 SS-TELA-SERVICO.
           05 VALUE "1 - INCLUIR"       LINE 15   COL 62.
           05 VALUE "2 - ALTERAR"       LINE 16   COL 62.
@@ -473,18 +504,28 @@
       *       
              WHEN 1
                 DISPLAY WS-LIMPAR-TELA AT 2302
+                MOVE 'M E N U  C A D A S T R O'
+                                       TO WS-MENSAGEM
+                DISPLAY WS-MENSAGEM    AT 0831
                 PERFORM 2200-REALIZAR-CADASTRO
              WHEN 2
-      *         
+                MOVE 'R E L A T O R I O'
+                                       TO WS-MENSAGEM
+                DISPLAY WS-MENSAGEM    AT 0831
+                DISPLAY WS-LIMPAR-TELA AT 2302
+                PERFORM 2300-FAZER-RELATORIO
+                MOVE ZEROS             TO WS-OPCAO
              WHEN 3
                        
              WHEN 4
                PERFORM 3000-FINALIZAR
              WHEN OTHER
-                DISPLAY 
+                DISPLAY WS-LIMPAR-TELA AT 2302
+                DISPLAY
                        "OPCAO INVALIDA - ESCOLHA UMA DAS OPCOES DO MENU"
                                        AT 2310
-                                       
+                STOP ' '                       
+                DISPLAY WS-LIMPAR-TELA AT 2302                       
            END-EVALUATE
           
            .
@@ -571,27 +612,35 @@
              ACCEPT  WS-OPCAO
              EVALUATE WS-OPCAO
                WHEN 1
-                   IF WS-ARQ-CLI-ABERTO EQUAL 'N'
+                   IF WS-ARQ-CLI-ABERTO 
+                                       EQUAL 'N'
                      MOVE 'C'          TO WS-RESPOSTA
                      PERFORM 2212-ABRIR-ARQUIVO
                    END-IF 
                    PERFORM 2216-INCLUIR-CLIENTE
                WHEN 2
-                   IF WS-ARQ-CLI-ABERTO EQUAL 'N'
+                   IF WS-ARQ-CLI-ABERTO 
+                                       EQUAL 'N'
                      MOVE 'C'          TO WS-RESPOSTA
                      PERFORM 2212-ABRIR-ARQUIVO
                    END-IF
                    PERFORM 2217-ALTERAR-CLIENTE
                WHEN 3
-                   IF WS-ARQ-CLI-ABERTO EQUAL 'N'
+                   IF WS-ARQ-CLI-ABERTO 
+                                       EQUAL 'N'
                      MOVE 'C'          TO WS-RESPOSTA
                      PERFORM 2212-ABRIR-ARQUIVO
                    END-IF
                    PERFORM 2218-DELETAR-CLIENTE
                WHEN 4
+                   IF WS-ARQ-CLI-ABERTO 
+                                       EQUAL 'N'
+                     MOVE 'C'          TO WS-RESPOSTA
+                     PERFORM 2212-ABRIR-ARQUIVO
+                   END-IF
                    PERFORM 2219-IMPORTAR-CLIENTE
                WHEN OTHER
-                   IF WS-OPCAO NOT EQUAL 5
+                   IF WS-OPCAO         NOT EQUAL 5
                        DISPLAY WS-LIMPAR-TELA
                                        AT 2302
                        MOVE                                             
@@ -649,6 +698,19 @@
                MOVE 'S'                TO WS-ARQ-CLI-ABERTO
              END-IF
            END-IF 
+           
+           IF WS-RESPOSTA              EQUAL 'V'
+             OPEN I-O                  ARQ-VENDEDOR
+             MOVE WS-ABERTURA          TO WS-OPERACAO
+             PERFORM 2237-TESTAR-FS-ARQ-VENDEDOR               
+           
+             IF WS-FS-VENDEDOR          EQUAL ZEROS OR '05'
+               MOVE 'S'                TO WS-ARQ-VEN-ABERTO
+             END-IF
+           END-IF
+           
+           
+           
            
            IF WS-RESPOSTA              EQUAL 'I'
              OPEN INPUT                ARQ-IMPORT
@@ -926,6 +988,10 @@
            ACCEPT WS-ARQ-IMPORT        AT 2333
            MOVE 'I'                    TO WS-RESPOSTA
            PERFORM 2212-ABRIR-ARQUIVO
+           IF WS-ARQ-CLI-ABERTO        EQUAL 'N'
+             MOVE 'C'                  TO WS-RESPOSTA
+           END-IF
+           PERFORM 2212-ABRIR-ARQUIVO
            
            IF WS-FS-IMPORT             EQUAL ZEROS
              PERFORM UNTIL WS-FIM-ARQ-IMPORT 
@@ -1092,7 +1158,6 @@
                  ADD 1                 TO ACU-GRAVADOS
                END-IF            
              ELSE
-      *      BUSCAR COD PELO CNPJ PRA FAZER REWRITE 
                MOVE WS-RZ-SOCIAL       TO BOOKCLI-RZ-SOCIAL
                MOVE WS-LATITUDE-CLI    TO BOOKCLI-LATITUDE-CLI
                MOVE WS-LONGITUDE-CLI   TO BOOKCLI-LONGITUDE-CLI
@@ -1102,7 +1167,6 @@
                IF WS-FS-CLIENTE        EQUAL ZEROS
                  ADD 1                 TO ACU-GRAVADOS
                END-IF
-      *-----------------------------------------------------------      
              END-IF
            ELSE
              MOVE WS-CNPJ              TO BOOKCLI-CNPJ
@@ -1112,6 +1176,13 @@
                MOVE 'N'                TO WS-ACHOU-COD
              END-READ
              IF WS-ACHOU-COD           EQUAL 'N'
+               MOVE 'REGISTRO INCONSISTENTE'
+                          
+                            TO WS-MENSAGEM
+               DISPLAY WS-MENSAGEM     AT 2310
+               STOP ' '
+               DISPLAY WS-LIMPAR-TELA  AT 2302
+             ELSE
                MOVE WS-RZ-SOCIAL       TO BOOKCLI-RZ-SOCIAL
                MOVE WS-LATITUDE-CLI    TO BOOKCLI-LATITUDE-CLI
                MOVE WS-LONGITUDE-CLI   TO BOOKCLI-LONGITUDE-CLI
@@ -1120,7 +1191,7 @@
                PERFORM 2213-TESTAR-FS-ARQ-CLIENTE
                IF WS-FS-CLIENTE        EQUAL ZEROS
                  ADD 1                 TO ACU-GRAVADOS
-               END-IF            
+               END-IF
              END-IF
            END-IF
            .
@@ -1144,17 +1215,34 @@
              ACCEPT  WS-OPCAO
              EVALUATE WS-OPCAO
                WHEN 1
-                 IF WS-ARQ-CLI-ABERTO  EQUAL 'N'
-                   MOVE 'C'          TO WS-RESPOSTA
+                 IF WS-ARQ-VEN-ABERTO  EQUAL 'N'
+                   MOVE 'V'          TO WS-RESPOSTA
                      PERFORM 2212-ABRIR-ARQUIVO
                    END-IF
                    PERFORM 2231-INCLUIR-VENDEDOR
                WHEN 2
-      *             PERFORM 2213-ALTERAR-CLIENTE
+                   IF WS-ARQ-VEN-ABERTO  EQUAL 'N'
+                   MOVE 'V'          TO WS-RESPOSTA
+                     PERFORM 2212-ABRIR-ARQUIVO
+                   END-IF
+                   PERFORM 2232-ALTERAR-VENDEDOR
                WHEN 3
-      *             PERFORM 2214-DELETAR-CLIENTE
+                   IF WS-ARQ-VEN-ABERTO  EQUAL 'N'
+                   MOVE 'V'          TO WS-RESPOSTA
+                     PERFORM 2212-ABRIR-ARQUIVO
+                   END-IF
+                  IF WS-ARQ-VEN-ABERTO  EQUAL 'N'
+                   
+                  MOVE 'V'          TO WS-RESPOSTA
+                     PERFORM 2212-ABRIR-ARQUIVO
+                   END-IF
+                  PERFORM 2233-DELETAR-VENDEDOR
                WHEN 4
-      *             PERFORM 2215-IMPORTAR-CLIENTE
+                   IF WS-ARQ-VEN-ABERTO  EQUAL 'N'
+                   MOVE 'V'          TO WS-RESPOSTA
+                     PERFORM 2212-ABRIR-ARQUIVO
+                   END-IF
+                   PERFORM 2234-IMPORTAR-VENDEDOR
                WHEN OTHER
                    IF WS-OPCAO NOT EQUAL 5
                        DISPLAY WS-LIMPAR-TELA
@@ -1199,7 +1287,19 @@
            END-READ
                        
            IF WS-ACHOU-COD EQUAL 'N' 
-              ACCEPT SS-CPF-VENDEDOR
+              MOVE 1                  TO BOOKLINK-RETORNO
+               
+              PERFORM UNTIL BOOKLINK-RETORNO EQUAL ZEROS
+                 ACCEPT SS-CPF-VENDEDOR
+                 PERFORM 3230-VALIDAR-CPF-CNPJ
+                 IF BOOKLINK-RETORNO        EQUAL 1 OR 2 OR 3
+                    DISPLAY WS-LIMPAR-TELA    AT 2302
+                    DISPLAY "INFORME UM CPF VALIDO!!!"
+                                                 AT 2315
+                    STOP ' '
+                 END-IF    
+               END-PERFORM
+              PERFORM 3230-VALIDAR-CPF-CNPJ
               MOVE 'S'                 TO WS-ACHOU-COD
               READ ARQ-VENDEDOR        KEY IS BOOKVEN-CPF
                                        INVALID KEY
@@ -1388,7 +1488,7 @@
       *----------------------------------------------------------------*
       *ROTINA PARA IMPORTAR VENDEDOR EM UM ARQUIVO EXTERNO             *
       *----------------------------------------------------------------*
-       2234-IMPORTAR-CLIENTE           SECTION.
+       2234-IMPORTAR-VENDEDOR          SECTION.
       *----------------------------------------------------------------*                                                                
            
            DISPLAY WS-LIMPAR-TELA      AT 2302
@@ -1399,21 +1499,21 @@
            MOVE 'I'                    TO WS-RESPOSTA
            PERFORM 2212-ABRIR-ARQUIVO
            
-           IF WS-FS-IMPORT             EQUAL ZEROS
-             PERFORM UNTIL WS-FIM-ARQ-IMPORT 
+           IF WS-FS-IMPORT-VEND        EQUAL ZEROS
+             PERFORM UNTIL WS-FIM-ARQ-IMPORT-VEND 
                                        EQUAL'S'
-               INITIALIZE              WS-AREA-ARQ-IMPORT           
-               READ ARQ-IMPORT         INTO WS-AREA-ARQ-IMPORT
+               INITIALIZE              WS-AREA-ARQ-IMPORT-VEN           
+               READ ARQ-IMPORT-VEND    INTO WS-AREA-ARQ-IMPORT-VEN 
                MOVE WS-LEITURA         TO WS-OPERACAO
-               PERFORM 2214-TESTAR-FS-ARQ-IMPORT
-               IF WS-FS-IMPORT         EQUAL ZEROS
-                 PERFORM 2238-MOVER-REGISTRO-VENDEDOR                   
+               PERFORM 2239-TESTAR-FS-ARQ-IMPORT-VEND                   
+               IF WS-FS-IMPORT-VEND    EQUAL ZEROS
+                 PERFORM 2238-MOVER-REGISTRO-VENDEDOR
                ELSE
-                 MOVE 'S'              TO WS-FIM-ARQ-IMPORT
-                 CLOSE ARQ-IMPORT
+                 MOVE 'S'              TO WS-FIM-ARQ-IMPORT-VEND    
+                 CLOSE ARQ-IMPORT-VEND
                  MOVE WS-FECHAMENTO    TO WS-OPERACAO
-                 PERFORM 2214-TESTAR-FS-ARQ-IMPORT
-                 IF WS-FS-IMPORT       NOT EQUAL ZEROS
+                 PERFORM 2239-TESTAR-FS-ARQ-IMPORT-VEND             
+                 IF WS-FS-IMPORT-VEND  NOT EQUAL ZEROS
                    DISPLAY WS-LIMPAR-TELA
                                        AT 2302
                  END-IF
@@ -1505,36 +1605,6 @@
       *----------------------------------------------------------------*
       *
       *----------------------------------------------------------------*
-      *ROTINA PARA ABRIR ARQ-VENDEDOR                                  *
-      *----------------------------------------------------------------*
-       2236-ABRIR-ARQUIVO-VENDEDOR     SECTION.
-      *----------------------------------------------------------------*
-      *    
-           IF WS-RESPOSTA              EQUAL 'C'
-             OPEN I-O                  ARQ-VENDEDOR
-             MOVE WS-ABERTURA          TO WS-OPERACAO
-             PERFORM 2237-TESTAR-FS-ARQ-VENDEDOR                 
-           
-             IF WS-FS-VENDEDOR         EQUAL ZEROS OR '05'
-               MOVE 'S'                TO WS-ARQ-VEND-ABERTO
-             END-IF
-           END-IF 
-           
-           IF WS-RESPOSTA              EQUAL 'I'
-             OPEN INPUT                ARQ-IMPORT
-             MOVE WS-ABERTURA          TO WS-OPERACAO
-             PERFORM 2214-TESTAR-FS-ARQ-IMPORT                  
-             IF WS-FS-IMPORT           EQUAL ZEROS 
-               MOVE 'S'                TO WS-ARQ-IMPORT-ABERTO
-             END-IF
-           END-IF
-           INITIALIZE                  WS-RESPOSTA
-           .
-      *----------------------------------------------------------------*
-       2236-99-FIM.                    EXIT.
-      *----------------------------------------------------------------*
-      *
-      *----------------------------------------------------------------*
       *    ROTINA PARA TESTE DE FILE STATUS DO ARQUIVO ARQ-VENDEDOR    *
       *----------------------------------------------------------------*
        2237-TESTAR-FS-ARQ-VENDEDOR     SECTION.
@@ -1548,6 +1618,10 @@
                STOP ' '
                DISPLAY WS-LIMPAR-TELA
            END-IF
+           
+           IF (WS-FS-VENDEDOR          EQUAL '10')
+              MOVE 'S'                 TO WS-ARQ-VEN-ABERTO
+           END-IF
            .
       *
       *----------------------------------------------------------------*
@@ -1559,67 +1633,277 @@
       *----------------------------------------------------------------*
        2238-MOVER-REGISTRO-VENDEDOR    SECTION.
       *----------------------------------------------------------------*     
-           
-           MOVE WS-COD-VENDEDOR        TO BOOKVEN-COD-VEND
+           MOVE WS-COD-VEND            TO BOOKVEN-COD-VEND              
            MOVE 'S'                    TO WS-ACHOU-COD
-           READ ARQ-CLIENTE            KEY IS BOOKCLI-COD-CLI
+           READ ARQ-VENDEDOR           KEY IS BOOKVEN-COD-VEND
                                        INVALID KEY
               MOVE 'N'                 TO WS-ACHOU-COD
            END-READ
            IF WS-ACHOU-COD             EQUAL 'N'
-             MOVE WS-CNPJ              TO BOOKCLI-CNPJ
+             MOVE WS-CPF               TO BOOKVEN-CPF
              MOVE 'S'                  TO WS-ACHOU-COD
-             READ ARQ-CLIENTE          KEY IS BOOKCLI-CNPJ
+             READ ARQ-VENDEDOR         KEY IS BOOKVEN-CPF
                                        INVALID KEY
                MOVE 'N'                TO WS-ACHOU-COD
              END-READ
              IF WS-ACHOU-COD           EQUAL 'N'
-               MOVE WS-RZ-SOCIAL       TO BOOKCLI-RZ-SOCIAL
-               MOVE WS-LATITUDE-CLI    TO BOOKCLI-LATITUDE-CLI
-               MOVE WS-LONGITUDE-CLI   TO BOOKCLI-LONGITUDE-CLI
-               WRITE BOOKCLI
+               MOVE WS-NOME            TO BOOKVEN-NOME
+               MOVE WS-LATITUDE-VEND   TO BOOKVEN-LATITUDE-VEND         
+               MOVE WS-LONGITUDE-VEND  TO BOOKVEN-LONGITUDE-VEND
+               WRITE BOOKVEN
                MOVE WS-GRAVACAO        TO WS-OPERACAO
-               PERFORM 2213-TESTAR-FS-ARQ-CLIENTE
-               IF WS-FS-CLIENTE        EQUAL ZEROS
+               PERFORM 2237-TESTAR-FS-ARQ-VENDEDOR
+               IF WS-FS-VENDEDOR       EQUAL ZEROS
                  ADD 1                 TO ACU-GRAVADOS
                END-IF            
              ELSE
-      *      BUSCAR COD PELO CNPJ PRA FAZER REWRITE 
-               MOVE WS-RZ-SOCIAL       TO BOOKCLI-RZ-SOCIAL
-               MOVE WS-LATITUDE-CLI    TO BOOKCLI-LATITUDE-CLI
-               MOVE WS-LONGITUDE-CLI   TO BOOKCLI-LONGITUDE-CLI
-               REWRITE BOOKCLI
+               MOVE WS-NOME            TO BOOKVEN-NOME
+               MOVE WS-LATITUDE-VEND   TO BOOKVEN-LATITUDE-VEND         
+               MOVE WS-LONGITUDE-VEND  TO BOOKVEN-LONGITUDE-VEND        
+               REWRITE BOOKVEN
                MOVE WS-GRAVACAO        TO WS-OPERACAO
-               PERFORM 2213-TESTAR-FS-ARQ-CLIENTE
-               IF WS-FS-CLIENTE        EQUAL ZEROS
+               PERFORM 2237-TESTAR-FS-ARQ-VENDEDOR
+               IF WS-FS-VENDEDOR       EQUAL ZEROS
                  ADD 1                 TO ACU-GRAVADOS
                END-IF
-      *-----------------------------------------------------------      
              END-IF
            ELSE
-             MOVE WS-CNPJ              TO BOOKCLI-CNPJ
+             MOVE WS-CPF               TO BOOKVEN-CPF
              MOVE 'S'                  TO WS-ACHOU-COD
-             READ ARQ-CLIENTE          KEY IS BOOKCLI-CNPJ
+             READ ARQ-VENDEDOR         KEY IS BOOKVEN-CPF
                                        INVALID KEY
                MOVE 'N'                TO WS-ACHOU-COD
              END-READ
              IF WS-ACHOU-COD           EQUAL 'N'
-               MOVE WS-RZ-SOCIAL       TO BOOKCLI-RZ-SOCIAL
-               MOVE WS-LATITUDE-CLI    TO BOOKCLI-LATITUDE-CLI
-               MOVE WS-LONGITUDE-CLI   TO BOOKCLI-LONGITUDE-CLI
-               REWRITE BOOKCLI
-               MOVE WS-GRAVACAO        TO WS-OPERACAO
-               PERFORM 2213-TESTAR-FS-ARQ-CLIENTE
-               IF WS-FS-CLIENTE        EQUAL ZEROS
-                 ADD 1                 TO ACU-GRAVADOS
-               END-IF            
+               MOVE 'REGISTRO INCONSISTENTE'
+                          
+                            TO WS-MENSAGEM
+               DISPLAY WS-MENSAGEM     AT 2310
+               STOP ' '
+               DISPLAY WS-LIMPAR-TELA  AT 2302
              END-IF
            END-IF
+           MOVE ZEROS                  TO ACU-GRAVADOS
            .
+           
       *----------------------------------------------------------------*
-       2222-99-FIM.                    EXIT.
+       2238-99-FIM.                    EXIT.
       *----------------------------------------------------------------*
       
+      *----------------------------------------------------------------*
+      *ROTINA PARA TESTAR FILETATUS DO ARQ-IMPORT-VENDEDOR             *
+      *----------------------------------------------------------------*
+       2239-TESTAR-FS-ARQ-IMPORT-VEND  SECTION.
+      *----------------------------------------------------------------*     
+           IF WS-FS-IMPORT-VEND       NOT EQUAL ZEROS     
+           
+               DISPLAY 'ERRO FILE STATUS: ',WS-FS-IMPORT-VEND,
+               ' OPERACAO: ',
+               WS-OPERACAO,' ARQUIVO IMPORTACAO VENDEDOR'
+                                       AT 2302
+               STOP ' '
+               DISPLAY WS-LIMPAR-TELA
+           END-IF
+           .
+           
+      *----------------------------------------------------------------*
+       2239-99-FIM.                    EXIT.
+      *----------------------------------------------------------------*
+      
+      *----------------------------------------------------------------*
+      *ROTINA PARA FINALIZAR PROGRAMA                                  *
+      *----------------------------------------------------------------*
+       2300-FAZER-RELATORIO            SECTION.
+      *----------------------------------------------------------------*
+           INITIALIZE                  WS-OPCAO
+           
+           PERFORM                     UNTIL WS-OPCAO
+                                       EQUAL 4
+              DISPLAY WS-LIMPAR-OPCAO  AT 2322
+              DISPLAY WS-LIMPAR-TELA   AT 2302
+              DISPLAY SS-SUB-MENU
+              DISPLAY SS-TELA-RELATORIO
+              ACCEPT  WS-OPCAO
+              EVALUATE WS-OPCAO
+                 WHEN 1
+                   PERFORM 2310-OPCOES-RELATORIO
+                 WHEN 2
+                     
+                 WHEN 3
+                 WHEN OTHER
+                   IF WS-OPCAO NOT EQUAL 4
+                     DISPLAY WS-LIMPAR-TELA
+                                       AT 2302
+                     DISPLAY
+                       "OPCAO INVALIDA - ESCOLHA UMA DAS OPCOES DO MENU"
+                                       AT 2302
+                     STOP ' '                  
+                   ELSE
+                     
+                      DISPLAY WS-LIMPAR-OPCAO
+                                       AT 2322
+                      PERFORM 2100-LIMPAR-SUB-MENU                 
+                   END-IF
+           
+           END-PERFORM.
+           .
+           .
+      *
+      *----------------------------------------------------------------*
+       2300-99-FIM.                    EXIT.
+      *----------------------------------------------------------------*    
+                                                                        
+      *----------------------------------------------------------------*
+      *ROTINA PARA OPCOES DE FILTROS DO RELATORIO                      *
+      *----------------------------------------------------------------*
+       2310-OPCOES-RELATORIO           SECTION.
+      *----------------------------------------------------------------*
+           INITIALIZE                  WS-OPCAO
+           PERFORM UNTIL WS-OPCAO      EQUAL 5
+             
+           DISPLAY WS-LIMPAR-TELA      AT 2302
+           DISPLAY SS-MENU-OPCAO-CLIENTE
+           DISPLAY SS-TELA-FILTRO
+           MOVE 'F I L T R O S'        TO WS-MENSAGEM
+           DISPLAY WS-MENSAGEM         AT 1361    
+           DISPLAY WS-LIMPAR-TELA      AT 2302
+           MOVE 'UTILIZE [S-SIM] OU [N] PARA SELECIONAR OS FILTROS'
+                                       TO WS-MENSAGEM
+           DISPLAY WS-MENSAGEM         AT 2310
+           PERFORM UNTIL WS-ASC EQUAL 'S' OR 'N'
+               ACCEPT  SS-ASC
+               IF WS-ASC               NOT EQUAL 'S' AND 'N'
+                 DISPLAY WS-LIMPAR-TELA    AT 2302
+                 MOVE ' OPCAO INVALIDA ULTILIZE [S] OU [N]'
+                                       TO WS-MENSAGEM
+                 DISPLAY WS-MENSAGEM   AT 2310
+                 STOP ' ' 
+                 DISPLAY WS-LIMPAR-TELA    AT 2302
+                 MOVE 
+                     'UTILIZE [S-SIM] OU [N] PARA SELECIONAR OS FILTROS'
+                                       TO WS-MENSAGEM
+                 DISPLAY WS-MENSAGEM   AT 2310                      
+               ELSE
+                  IF WS-ASC            EQUAL 'S'
+                    MOVE 'N'           TO WS-DESC
+                    DISPLAY 'N'        AT 1677
+                  ELSE
+                    MOVE 'S'           TO WS-DESC
+                    DISPLAY 'S'        AT 1677
+                  END-IF
+               END-IF
+           END-PERFORM
+           
+          DISPLAY WS-LIMPAR-TELA      AT 2302
+           MOVE 'INFORME O CODIGO DO CLIENTE OU ZEROS PARA LISTAR TODOS'
+                                       TO WS-MENSAGEM
+           DISPLAY WS-MENSAGEM         AT 2310
+           
+           ACCEPT  SS-CODIGO-RELAT
+           MOVE 'S'                    TO WS-ACHOU-COD
+           IF WS-ARQ-CLI-ABERTO        EQUAL 'N'
+             MOVE 'C'                  TO WS-RESPOSTA
+             PERFORM 2212-ABRIR-ARQUIVO
+           END-IF
+           IF BOOKCLI-COD-CLI          EQUAL ZEROS
+           
+              READ ARQ-CLIENTE            KEY IS BOOKCLI-COD-CLI
+                                       INVALID KEY
+              MOVE 'N'                 TO WS-ACHOU-COD
+              END-READ
+           END-IF
+           
+           IF WS-ACHOU-COD             EQUAL 'S' 
+           AND BOOKCLI-COD-CLI         EQUAL ZEROS 
+             DISPLAY WS-LIMPAR-TELA    AT 2302
+             MOVE 'CODIGO NAO ENCONTRADO'
+                                       TO WS-MENSAGEM
+             DISPLAY WS-MENSAGEM       AT 2310 
+             STOP ' '
+             DISPLAY WS-LIMPAR-TELA    AT 2302
+             DISPLAY WS-LIMPAR-OPCAO 
+                                       AT 2322
+             PERFORM 2211-LIMPAR-MENU-OPCAO                             
+           ELSE                                                         
+             PERFORM 2320-VISUALIZAR-RELATORIO                          
+           END-IF   
+           
+           
+           .                                                            
+      *                                                                 
+      *----------------------------------------------------------------*
+       2310-99-FIM.                    EXIT.                            
+      *----------------------------------------------------------------*  
+                                                                          
+      *----------------------------------------------------------------*
+      *ROTINA PARA GERAR RELATORIO                                     *
+      *----------------------------------------------------------------*
+       2320-VISUALIZAR-RELATORIO       SECTION.
+      *----------------------------------------------------------------* 
+           IF WS-ASC                   EQUAL 'S'
+             MOVE ZEROS                TO BOOKCLI-COD-CLI
+             START ARQ-CLIENTE KEY EQUAL BOOKCLI-COD-CLI
+             
+             PERFORM UNTIL WS-FIM-ARQ-CLI EQUAL'S'
+                READ ARQ-CLIENTE
+                PERFORM 2213-TESTAR-FS-ARQ-CLIENTE
+                IF WS-FS-CLIENTE       EQUAL '10'
+                  MOVE 'S'             TO WS-FIM-ARQ-CLI
+                END-IF
+                IF WS-FS-CLIENTE    EQUAL ZEROS
+                   PERFORM 2220-LIMPAR-FUNDO
+                   DISPLAY WS-LIMPAR-TELA      AT 2302
+                   DISPLAY WS-LIMPAR-TELA      AT 0202
+                   MOVE 'R E L A T O R I O'
+                                       TO WS-MENSAGEM
+                   DISPLAY WS-MENSAGEM         AT 0217                  
+                    
+                   DISPLAY SS-TELA-INSERIR-CLIENTE
+                   DISPLAY BOOKCLI-COD-CLI  AT 0520
+                   DISPLAY BOOKCLI-CNPJ     AT 0720
+                   DISPLAY BOOKCLI-RZ-SOCIAL        
+                                       AT 0920
+                   DISPLAY BOOKCLI-LATITUDE-CLI
+                                       AT 1120
+                   DISPLAY BOOKCLI-LONGITUDE-CLI
+                                       AT 1320
+                   STOP ' '
+                   DISPLAY WS-LIMPAR-TELA      AT 2302
+                   MOVE 'PRESSIONE ENTER PARA PROXIMO '
+                                       TO WS-MENSAGEM
+                   DISPLAY WS-MENSAGEM         AT 0217
+                   STOP ' '
+                   PERFORM 2220-LIMPAR-FUNDO
+                   DISPLAY
+                    WS-LIMPAR-TELA      AT 2302
+                END-IF
+             END-PERFORM
+           ELSE
+             MOVE 9999999              TO BOOKCLI-COD-CLI
+             START ARQ-CLIENTE KEY EQUAL BOOKCLI-COD-CLI
+           END-IF.                                                                                                                          
+      *----------------------------------------------------------------*
+       2320-99-FIM.                    EXIT.                            
+      *----------------------------------------------------------------*  
+      
+      *----------------------------------------------------------------*
+      *ROTINA PARA VALIDAR CPF                                         *
+      *----------------------------------------------------------------*
+       3230-VALIDAR-CPF-CNPJ        SECTION.
+      *----------------------------------------------------------------*                                                                                                                                          
+       
+           INITIALIZE                    WS-LINKAGE
+                     
+           MOVE BOOKVEN-CPF              TO BOOKLINK-NUMERO-I      
+           MOVE 'CPF'                    TO BOOKLINK-TIPO-CALCULO
+           MOVE 'V'                      TO BOOKLINK-ACAO
+           CALL 'VALIDARCPF'             USING WS-LINKAGE
+           .
+       
+      *----------------------------------------------------------------*
+       2320-99-FIM.                    EXIT.                            
+      *----------------------------------------------------------------*   
+    
       *----------------------------------------------------------------*
       *ROTINA PARA FINALIZAR PROGRAMA                                  *
       *----------------------------------------------------------------*
@@ -1632,6 +1916,20 @@
              CLOSE ARQ-CLIENTE
              PERFORM 2213-TESTAR-FS-ARQ-CLIENTE
            END-IF
+           
+           IF WS-ARQ-VEN-ABERTO        EQUAL 'S'
+             MOVE 
+           WS-FECHAMENTO        TO WS-OPERACAO
+             CLOSE ARQ-VENDEDOR
+             PERFORM 2237-TESTAR-FS-ARQ-VENDEDOR
+           END-IF
+           
+           IF WS-ARQ-IMPORT-ABERTO     EQUAL 'S'
+             MOVE WS-FECHAMENTO        TO WS-OPERACAO
+             CLOSE ARQ-IMPORT
+             PERFORM 2214-TESTAR-FS-ARQ-IMPORT
+           END-IF
+           
       *
            STOP RUN
            .
